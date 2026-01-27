@@ -1,0 +1,29 @@
+set_control:
+  name: Set control parameters
+  description: Send control parameters to SolarEdgeController (/control).
+  fields:
+    entry_id:
+      name: Entry ID
+      description: Optional. If you have multiple SolarEdgeController instances, specify the config entry_id.
+      required: false
+      example: "abcd1234efgh5678"
+      selector:
+        text: {}
+    current_price:
+      name: Current price
+      description: Current electricity price.
+      required: false
+      example: 0.12
+      selector:
+        number:
+          min: -1000
+          max: 1000
+          step: 0.0001
+          mode: box
+    negative_price:
+      name: Negative price
+      description: Whether price is negative.
+      required: false
+      example: false
+      selector:
+        boolean: {}

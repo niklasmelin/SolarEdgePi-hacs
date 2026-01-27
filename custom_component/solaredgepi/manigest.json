@@ -1,0 +1,11 @@
+{
+  "domain": "solaredgecontroller",
+  "name": "SolarEdgeController",
+  "version": "0.1.0",
+  "config_flow": true,
+  "documentation": "https://github.com/niklasmelin/solaredgecontroller-ha",
+  "issue_tracker": "https://github.com/niklasmelin/solaredgecontroller-ha/issues",
+  "codeowners": ["@niklasmelin"],
+  "iot_class": "local_polling",
+  "requirements": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "SolarEdgeController",
+  "content_in_root": false,
+  "render_readme": true,
+  "domains": ["solaredgecontroller"],
+  "homeassistant": "2024.6.0"
+}
