@@ -23,8 +23,8 @@ async def async_setup_entry(
 
     async_add_entities(
         [
-            SolarEdgeControllerSwitch(coordinator, api, entry, ATTR_LIMIT_EXPORT, "Limit export"),
-            SolarEdgeControllerSwitch(coordinator, api, entry, ATTR_AUTO_MODE, "Auto mode"),
+            SolarEdgeControllerSwitch(coordinator, api, entry, ATTR_LIMIT_EXPORT, "SolarEdge Limit export"),
+            SolarEdgeControllerSwitch(coordinator, api, entry, ATTR_AUTO_MODE, "SolarEdge Auto mode"),
         ]
     )
 
