@@ -13,10 +13,13 @@ CONF_SCAN_INTERVAL = "scan_interval"
 DEFAULT_TIMEOUT = 10
 DEFAULT_SCAN_INTERVAL = 10  # seconds
 
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH, Platform.NUMBER]
 
 SERVICE_SET_CONTROL = "set_control"
 
 ATTR_ENTRY_ID = "entry_id"
-ATTR_CURRENT_PRICE = "current_price"
-ATTR_NEGATIVE_PRICE = "negative_price"
+# Attributes for controll limit_export, auto_mode, auto_mode_threshold, power_limit_W
+ATTR_LIMIT_EXPORT = "limit_export"
+ATTR_AUTO_MODE = "auto_mode"
+ATTR_AUTO_MODE_THRESHOLD = "auto_mode_threshold"
+ATTR_POWER_LIMIT_W = "power_limit_W"

@@ -45,7 +45,19 @@ class SolarEdgeControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
 
             try:
-                await api.async_get_sensors()
+                # /status/json is intentionally not auth-protected (in controller server.py).
+                await api.async_get_status()
+
+                # Validate token by hitting /sensors (auth protected), but allow 503 during identity init.
+                try:
+                    await api.async_get_sensors()
+                except SolarEdgeControllerAuthError:
+                    raise
+                except SolarEdgeControllerApiError as err:
+                    # /sensors returns 503 while inverter identity registers are not ready.
+                    # Treat as OK for setup; entities will appear once /sensors stabilizes.
+                    _LOGGER.debug("/sensors not ready yet during setup: %s", err)
+
             except SolarEdgeControllerAuthError:
                 errors["base"] = "invalid_auth"
             except SolarEdgeControllerApiError:

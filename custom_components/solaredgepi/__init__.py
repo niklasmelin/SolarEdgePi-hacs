@@ -13,9 +13,11 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import SolarEdgeControllerApiClient
 from .const import (
-    ATTR_CURRENT_PRICE,
+    ATTR_AUTO_MODE,
+    ATTR_AUTO_MODE_THRESHOLD,
     ATTR_ENTRY_ID,
-    ATTR_NEGATIVE_PRICE,
+    ATTR_LIMIT_EXPORT,
+    ATTR_POWER_LIMIT_W,
     CONF_BASE_URL,
     CONF_SCAN_INTERVAL,
     CONF_TIMEOUT,
@@ -34,8 +36,10 @@ _LOGGER = logging.getLogger(__name__)
 SERVICE_SCHEMA = vol.Schema(
     {
         vol.Optional(ATTR_ENTRY_ID): str,
-        vol.Optional(ATTR_CURRENT_PRICE): vol.Coerce(float),
-        vol.Optional(ATTR_NEGATIVE_PRICE): bool,
+        vol.Optional(ATTR_LIMIT_EXPORT): bool,
+        vol.Optional(ATTR_AUTO_MODE): bool,
+        vol.Optional(ATTR_AUTO_MODE_THRESHOLD): vol.Coerce(int),
+        vol.Optional(ATTR_POWER_LIMIT_W): vol.Coerce(int),
     }
 )
 
@@ -77,7 +81,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    # Register the service once globally
+    # Optional service (advanced users)
     if not hass.services.has_service(DOMAIN, SERVICE_SET_CONTROL):
 
         async def _handle_set_control(call: ServiceCall) -> None:
@@ -97,17 +101,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 )
 
             payload: dict[str, Any] = {}
-            if ATTR_CURRENT_PRICE in call.data:
-                payload["current_price"] = call.data[ATTR_CURRENT_PRICE]
-            if ATTR_NEGATIVE_PRICE in call.data:
-                payload["negative_price"] = call.data[ATTR_NEGATIVE_PRICE]
+            for k in (ATTR_LIMIT_EXPORT, ATTR_AUTO_MODE, ATTR_AUTO_MODE_THRESHOLD, ATTR_POWER_LIMIT_W):
+                if k in call.data:
+                    payload[k] = call.data[k]
 
             if not payload:
-                raise HomeAssistantError("No fields provided. Set 'current_price' and/or 'negative_price'.")
+                raise HomeAssistantError(
+                    "No fields provided. Set one or more of: limit_export, auto_mode, auto_mode_threshold, power_limit_W."
+                )
 
             for tid in targets:
                 api_client: SolarEdgeControllerApiClient = hass.data[DOMAIN][tid]["api"]
                 await api_client.async_set_control(payload)
+                # Refresh coordinator so entities reflect the applied values
+                hass.data[DOMAIN][tid]["coordinator"].async_request_refresh()
 
         hass.services.async_register(
             DOMAIN,

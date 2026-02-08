@@ -1,6 +1,6 @@
 set_control:
   name: Set control parameters
-  description: Send control parameters to SolarEdgeController (/control).
+  description: Send control parameters to SolarEdgeController (/control). Usually you control these via the switch/number entities; this service is optional for advanced use.
   fields:
     entry_id:
       name: Entry ID
@@ -9,21 +9,37 @@ set_control:
       example: "abcd1234efgh5678"
       selector:
         text: {}
-    current_price:
-      name: Current price
-      description: Current electricity price.
+    limit_export:
+      name: Limit export
+      description: Enable export limiting.
       required: false
-      example: 0.12
-      selector:
-        number:
-          min: -1000
-          max: 1000
-          step: 0.0001
-          mode: box
-    negative_price:
-      name: Negative price
-      description: Whether price is negative.
-      required: false
-      example: false
       selector:
         boolean: {}
+    auto_mode:
+      name: Auto mode
+      description: Enable automatic mode.
+      required: false
+      selector:
+        boolean: {}
+    auto_mode_threshold:
+      name: Auto mode threshold (W)
+      description: Threshold in watts used by automatic mode.
+      required: false
+      example: 200
+      selector:
+        number:
+          min: 0
+          max: 20000
+          step: 100
+          mode: box
+    power_limit_W:
+      name: Power limit (W)
+      description: Requested inverter power limit in watts.
+      required: false
+      example: 3000
+      selector:
+        number:
+          min: 500
+          max: 20000
+          step: 100
+          mode: box

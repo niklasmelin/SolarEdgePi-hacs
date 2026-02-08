@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.components.sensor import SensorEntity, SensorDeviceClass, SensorStateClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo, EntityCategory
@@ -21,15 +21,15 @@ async def async_setup_entry(
     data = hass.data[DOMAIN][entry.entry_id]
     coordinator: SolarEdgeControllerCoordinator = data["coordinator"]
 
-    entities: list[SolarEdgeControllerSensor] = []
-    for key in coordinator.data.keys():
-        entities.append(SolarEdgeControllerSensor(coordinator, entry, key))
-
+    sensors = coordinator.data.get("sensors", {}) if coordinator.data else {}
+    entities: list[SolarEdgeControllerSensor] = [
+        SolarEdgeControllerSensor(coordinator, entry, key) for key in sensors.keys()
+    ]
     async_add_entities(entities)
 
 
 class SolarEdgeControllerSensor(CoordinatorEntity[SolarEdgeControllerCoordinator], SensorEntity):
-    """Representation of a sensor exposed by SolarEdgeController."""
+    """Representation of a sensor exposed by SolarEdgeController (/sensors)."""
 
     def __init__(
         self,
@@ -64,7 +64,8 @@ class SolarEdgeControllerSensor(CoordinatorEntity[SolarEdgeControllerCoordinator
     @property
     def _meta(self) -> dict[str, Any]:
         data = self.coordinator.data or {}
-        meta = data.get(self._sensor_key, {})
+        sensors = data.get("sensors", {})
+        meta = sensors.get(self._sensor_key, {}) if isinstance(sensors, dict) else {}
         return meta if isinstance(meta, dict) else {}
 
     @property

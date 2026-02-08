@@ -37,7 +37,22 @@ class SolarEdgeControllerApiClient:
         # aiohttp: ssl=False disables certificate verification (useful for self-signed certs)
         return None if self.verify_ssl else False
 
+    async def async_get_status(self) -> dict[str, Any]:
+        """GET /status/json (not auth-protected in controller)."""
+        try:
+            async with self.session.get(
+                self._url("/status/json"),
+                headers=self._headers(),
+                ssl=self._ssl_param(),
+                timeout=self.timeout,
+            ) as resp:
+                resp.raise_for_status()
+                return await resp.json()
+        except (asyncio.TimeoutError, ClientResponseError, ClientError, json.JSONDecodeError) as err:
+            raise SolarEdgeControllerApiError(str(err)) from err
+
     async def async_get_sensors(self) -> dict[str, Any]:
+        """GET /sensors (auth-protected; may return 503 while inverter identity initializes)."""
         try:
             async with self.session.get(
                 self._url("/sensors"),
@@ -55,6 +70,7 @@ class SolarEdgeControllerApiClient:
             raise SolarEdgeControllerApiError(str(err)) from err
 
     async def async_set_control(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """POST /control (auth-protected)."""
         try:
             async with self.session.post(
                 self._url("/control"),
