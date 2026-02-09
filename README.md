@@ -1,5 +1,7 @@
 # SolarEdgeController (Local API)
 
+![imgage](/custom_components/solaredgepi/icons/icon@large.png)
+
 Home Assistant custom integration for a local SolarEdgeController HTTP(S) API.
 
 This integration requires the SolarEdgeController backend to be running and exposing the HTTP endpoints described below:
